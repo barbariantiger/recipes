@@ -7,8 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.validation.ConstraintViolationException;
-
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,15 +19,10 @@ class RecipesBookApplicationTests {
 	@Autowired
 	private MockMvc mockMvc;
 
-	private String content = "{" +
-			"\"suitableFor\": 2, " +
-			"\"vegetarian\": true, " +
-			"\"ingredients\": [ \"1kg of something\" ], " +
-			"\"instructions\": \"Mix this with that\" " +
-			"}";
-
 	@Test
 	public void whenCreateRecipeThenRecipe() throws Exception {
+		String content = "{ \"suitableFor\": 2, \"vegetarian\": true, \"ingredients\": [ \"1kg of something\" ], " +
+				"\"instructions\": \"Mix this with that\" }";
 		this.mockMvc.perform(post("/recipes")
 				.content(content)
 				.contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -38,5 +31,45 @@ class RecipesBookApplicationTests {
 				.andExpect(jsonPath("$.vegetarian", is(true)))
 				.andExpect(jsonPath("$.ingredients[0]", is("1kg of something")))
 				.andExpect(jsonPath("$.instructions", is("Mix this with that")));
+	}
+
+	@Test
+	public void givenZeroSuitableForWhenCreateRecipeThenException() throws Exception {
+		String content = "{ \"suitableFor\": 0, \"vegetarian\": true, \"ingredients\": [ \"1kg of something\" ], " +
+				"\"instructions\": \"Mix this with that\" }";
+		this.mockMvc.perform(post("/recipes")
+				.content(content)
+				.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void givenNullVegetarianWhenCreateRecipeThenException() throws Exception {
+		String content = "{ \"suitableFor\": 1, \"ingredients\": [ \"1kg of something\" ], " +
+				"\"instructions\": \"Mix this with that\" }";
+		this.mockMvc.perform(post("/recipes")
+				.content(content)
+				.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void givenNullIngredientsWhenCreateRecipeThenException() throws Exception {
+		String content = "{ \"suitableFor\": 1, \"vegetarian\": true , " +
+				"\"instructions\": \"Mix this with that\" }";
+		this.mockMvc.perform(post("/recipes")
+				.content(content)
+				.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void givenBlankInstructionsWhenCreateRecipeThenException() throws Exception {
+		String content = "{ \"suitableFor\": 2, \"vegetarian\": true, \"ingredients\": [ \"1kg of something\" ], " +
+				"\"instructions\": \"\" }";
+		this.mockMvc.perform(post("/recipes")
+				.content(content)
+				.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isBadRequest());
 	}
 }

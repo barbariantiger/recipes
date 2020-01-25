@@ -1,9 +1,9 @@
 package nl.maikel.model;
 
-import com.mongodb.lang.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -19,6 +19,7 @@ public class Recipe {
     @NotNull(message = "Is it a vegetarian dish?")
     private Boolean vegetarian;
     @NotNull(message = "For how many people is it suitable for?")
+    @Min(value = 1, message = "The recipe must be at least for one person.")
     private Byte suitableFor;
     @NotNull(message = "Please provide at least one ingredient.")
     private List<String> ingredients;

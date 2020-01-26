@@ -11,8 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -96,5 +95,22 @@ class RecipesBookApplicationTests {
 		this.mockMvc.perform(get("/recipes/{id}", "inexistentId")
 				.contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(status().isNotFound());
+	}
+
+	@Test
+	public void givenExistingRecipeWhenUpdateRecipeThenRecipe() throws Exception {
+		String content = "{ \"suitableFor\": 2, \"vegetarian\": true, \"ingredients\": [ \"1kg of something\" ], " +
+				"\"instructions\": \"Mix this with that\" }";
+		String updatedContent = "{ \"suitableFor\": 1, \"vegetarian\": true, \"ingredients\": [ \"1kg of something\" ], " +
+				"\"instructions\": \"Mix this with that\" }";
+		this.mockMvc.perform(post("/recipes")
+				.content(content)
+				.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isCreated())
+				.andDo(result -> this.mockMvc.perform(put("/recipes/{id}",
+						result.getResponse().getContentAsString().split("\"")[3])
+						.content(updatedContent)
+						.contentType(MediaType.APPLICATION_JSON_VALUE))
+						.andExpect(status().isOk()));
 	}
 }

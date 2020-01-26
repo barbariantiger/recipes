@@ -26,4 +26,10 @@ public class RecipeController {
     public ResponseEntity<?> readRecipe(@PathVariable("id") String id) throws RecipeNotFoundException {
         return new ResponseEntity<>(this.service.readRecipe(id), HttpStatus.OK);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateRecipe(@PathVariable("id") String id, @RequestBody Recipe recipe)
+            throws RecipeNotFoundException {
+        return new ResponseEntity<>(this.service.updateRecipe(id, recipe), HttpStatus.OK);
+    }
 }

@@ -6,6 +6,7 @@ import nl.maikel.repository.RecipeRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class RecipeServiceImpl implements RecipeService {
@@ -36,5 +37,10 @@ public class RecipeServiceImpl implements RecipeService {
         actualRecipe.setInstructions(updatedRecipe.getInstructions());
         actualRecipe.setIngredients(updatedRecipe.getIngredients());
         return this.repository.save(actualRecipe);
+    }
+
+    @Override
+    public List<Recipe> listAllRecipes() {
+        return this.repository.findAll();
     }
 }

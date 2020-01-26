@@ -32,4 +32,9 @@ public class RecipeController {
             throws RecipeNotFoundException {
         return new ResponseEntity<>(this.service.updateRecipe(id, recipe), HttpStatus.OK);
     }
+
+    @GetMapping
+    public ResponseEntity<?> findAllRecipes() {
+        return new ResponseEntity<>(this.service.listAllRecipes(), HttpStatus.OK);
+    }
 }

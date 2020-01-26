@@ -29,20 +29,24 @@ public class Recipe {
     @NotBlank(message = "Please provide the cooking instructions of the dish.")
     private String instructions;
 
+    public Recipe() {
+    }
+
+    public Recipe(LocalDateTime createdOn, Boolean vegetarian,
+                  Byte suitableFor, List<String> ingredients, String instructions) {
+        this.createdOn = createdOn;
+        this.vegetarian = vegetarian;
+        this.suitableFor = suitableFor;
+        this.ingredients = ingredients;
+        this.instructions = instructions;
+    }
+
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public Long getVersion() {
         return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
     }
 
     public LocalDateTime getCreatedOn() {

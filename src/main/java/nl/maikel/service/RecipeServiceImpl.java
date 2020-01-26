@@ -43,4 +43,13 @@ public class RecipeServiceImpl implements RecipeService {
     public List<Recipe> listAllRecipes() {
         return this.repository.findAll();
     }
+
+    @Override
+    public void deleteRecipe(String id) throws RecipeNotFoundException {
+        if (this.repository.existsById(id)) {
+            this.repository.deleteById(id);
+        } else {
+            throw new RecipeNotFoundException();
+        }
+    }
 }

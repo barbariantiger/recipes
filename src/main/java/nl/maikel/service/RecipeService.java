@@ -13,4 +13,6 @@ public interface RecipeService {
     Recipe updateRecipe(String id, Recipe recipe) throws RecipeNotFoundException;
 
     List<Recipe> listAllRecipes();
+
+    void deleteRecipe(String id) throws RecipeNotFoundException;
 }

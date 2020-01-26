@@ -37,4 +37,10 @@ public class RecipeController {
     public ResponseEntity<?> findAllRecipes() {
         return new ResponseEntity<>(this.service.listAllRecipes(), HttpStatus.OK);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteRecipe(@PathVariable("id") String id) throws RecipeNotFoundException {
+        this.service.deleteRecipe(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

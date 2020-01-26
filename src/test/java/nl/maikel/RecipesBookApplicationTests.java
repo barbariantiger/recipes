@@ -115,8 +115,8 @@ class RecipesBookApplicationTests {
 	}
 
 	@Test
-	public void givenRecipeNotExistsWhenReadRecipeThenException() throws Exception {
-		this.mockMvc.perform(get("/recipes/{id}", "inexistentId")
+	public void givenUnexistentRecipeWhenReadRecipeThenException() throws Exception {
+		this.mockMvc.perform(get("/recipes/{id}", "unexistentId")
 				.contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(status().isNotFound());
 	}
@@ -142,5 +142,19 @@ class RecipesBookApplicationTests {
 				.contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(3)));
+	}
+
+	@Test
+	public void givenExistingRecipeWhenDeleteRecipeThenRecipeDeleted() throws Exception {
+		this.mockMvc.perform(delete("/recipes/{id}", recipes.get(0).getId())
+				.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isNoContent());
+	}
+
+	@Test
+	public void givenUnexistentRecipeWhenDeleteRecipeThenRecipeDeleted() throws Exception {
+		this.mockMvc.perform(delete("/recipes/{id}", "unexistentId")
+				.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isNotFound());
 	}
 }

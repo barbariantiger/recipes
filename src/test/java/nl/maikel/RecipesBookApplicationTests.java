@@ -1,6 +1,9 @@
 package nl.maikel;
 
-import org.bson.types.ObjectId;
+import nl.maikel.model.Recipe;
+import nl.maikel.repository.RecipeRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -8,8 +11,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.IntStream;
 
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -19,8 +27,30 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class RecipesBookApplicationTests {
 
-	@Autowired
 	private MockMvc mockMvc;
+	private RecipeRepository repository;
+	private List<Recipe> recipes;
+
+	@Autowired
+	private RecipesBookApplicationTests(MockMvc mockMvc, RecipeRepository repository) {
+		this.mockMvc = mockMvc;
+		this.repository = repository;
+	}
+
+	@BeforeEach
+	public void setup() {
+		List<String> ingredients = Arrays.asList("Ingredient 1", "Ingredient 2", "Ingredient 3");
+		recipes = IntStream.range(1, 4).mapToObj(i ->
+				new Recipe(LocalDateTime.now(), i % 2 == 0,
+						(byte) i, ingredients, "Instruction " + i))
+				.collect(toList());
+		repository.saveAll(recipes);
+	}
+
+	@AfterEach
+	public void tearDown() {
+		repository.deleteAll();
+	}
 
 	@Test
 	public void whenCreateRecipeThenRecipe() throws Exception {
@@ -30,6 +60,7 @@ class RecipesBookApplicationTests {
 				.content(content)
 				.contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.version", is(0)))
 				.andExpect(jsonPath("$.suitableFor", is(2)))
 				.andExpect(jsonPath("$.vegetarian", is(true)))
 				.andExpect(jsonPath("$.ingredients[0]", is("1kg of something")))
@@ -78,16 +109,9 @@ class RecipesBookApplicationTests {
 
 	@Test
 	public void givenRecipeExistsWhenReadRecipeThenRecipe() throws Exception {
-		String content = "{ \"suitableFor\": 2, \"vegetarian\": true, \"ingredients\": [ \"1kg of something\" ], " +
-				"\"instructions\": \"Mix this with that\" }";
-		this.mockMvc.perform(post("/recipes")
-				.content(content)
+		this.mockMvc.perform(get("/recipes/{id}", this.recipes.get(0).getId())
 				.contentType(MediaType.APPLICATION_JSON_VALUE))
-				.andExpect(status().isCreated())
-				.andDo(result -> this.mockMvc.perform(get("/recipes/{id}",
-						result.getResponse().getContentAsString().split("\"")[3])
-						.contentType(MediaType.APPLICATION_JSON_VALUE))
-						.andExpect(status().isOk()));
+				.andExpect(status().isOk());
 	}
 
 	@Test
@@ -99,18 +123,24 @@ class RecipesBookApplicationTests {
 
 	@Test
 	public void givenExistingRecipeWhenUpdateRecipeThenRecipe() throws Exception {
-		String content = "{ \"suitableFor\": 2, \"vegetarian\": true, \"ingredients\": [ \"1kg of something\" ], " +
-				"\"instructions\": \"Mix this with that\" }";
-		String updatedContent = "{ \"suitableFor\": 1, \"vegetarian\": true, \"ingredients\": [ \"1kg of something\" ], " +
-				"\"instructions\": \"Mix this with that\" }";
-		this.mockMvc.perform(post("/recipes")
-				.content(content)
+		String updatedContent = "{ \"suitableFor\": 2, \"vegetarian\": true, " +
+				"\"ingredients\": [ \"1kg of something\" ], \"instructions\": \"Just mix all the ingredients.\" }";
+		this.mockMvc.perform(put("/recipes/{id}", this.recipes.get(0).getId())
+				.content(updatedContent)
 				.contentType(MediaType.APPLICATION_JSON_VALUE))
-				.andExpect(status().isCreated())
-				.andDo(result -> this.mockMvc.perform(put("/recipes/{id}",
-						result.getResponse().getContentAsString().split("\"")[3])
-						.content(updatedContent)
-						.contentType(MediaType.APPLICATION_JSON_VALUE))
-						.andExpect(status().isOk()));
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.version", is(1)))
+				.andExpect(jsonPath("$.suitableFor", is(2)))
+				.andExpect(jsonPath("$.vegetarian", is(true)))
+				.andExpect(jsonPath("$.ingredients[0]", is("1kg of something")))
+				.andExpect(jsonPath("$.instructions", is("Just mix all the ingredients.")));
+	}
+
+	@Test
+	public void whenFindAllRecipesThenRecipesList() throws Exception {
+		this.mockMvc.perform(get("/recipes")
+				.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(3)));
 	}
 }

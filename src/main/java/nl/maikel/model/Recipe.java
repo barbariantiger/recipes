@@ -1,6 +1,7 @@
 package nl.maikel.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Min;
@@ -15,6 +16,8 @@ public class Recipe {
 
     @Id
     private String id;
+    @Version
+    private Long version;
     private LocalDateTime createdOn;
     @NotNull(message = "Is it a vegetarian dish?")
     private Boolean vegetarian;
@@ -32,6 +35,14 @@ public class Recipe {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public LocalDateTime getCreatedOn() {
@@ -91,6 +102,7 @@ public class Recipe {
     public String toString() {
         return "Recipe{" +
                 "id='" + id + '\'' +
+                ", version=" + version +
                 ", createdOn=" + createdOn +
                 ", vegetarian=" + vegetarian +
                 ", suitableFor=" + suitableFor +

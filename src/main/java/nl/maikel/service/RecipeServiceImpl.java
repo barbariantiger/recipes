@@ -26,4 +26,15 @@ public class RecipeServiceImpl implements RecipeService {
     public Recipe readRecipe(String id) throws RecipeNotFoundException {
         return repository.findById(id).orElseThrow(RecipeNotFoundException::new);
     }
+
+    @Override
+    public Recipe updateRecipe(String id, Recipe updatedRecipe) throws RecipeNotFoundException {
+        Recipe actualRecipe = this.repository.findById(id)
+                .orElseThrow(RecipeNotFoundException::new);
+        actualRecipe.setVegetarian(updatedRecipe.isVegetarian());
+        actualRecipe.setSuitableFor(updatedRecipe.getSuitableFor());
+        actualRecipe.setInstructions(updatedRecipe.getInstructions());
+        actualRecipe.setIngredients(updatedRecipe.getIngredients());
+        return this.repository.save(actualRecipe);
+    }
 }

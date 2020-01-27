@@ -1,11 +1,12 @@
 #Recipe book
 
-##Technologies used
+##Technologies
 - Spring Boot Web version 2.2.4;
 - Spring Boot Data MongoDB version 2.2.4;
 - MongoDB plugin version 2.2.0;
-- Swagger version 2.9.2
-- JUnit version 5
+- Swagger version 2.9.2;
+- JUnit version 5;
+- Gradle version 6.0.1
 
 ##Why?
 - Spring Boot is scalable, cloud ready and easy to deploy;

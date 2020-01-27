@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      username: user
+      database: recipes-prod
+      password: "*****"
+      authentication-database: admin

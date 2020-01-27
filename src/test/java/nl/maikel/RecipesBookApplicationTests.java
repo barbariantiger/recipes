@@ -41,7 +41,7 @@ class RecipesBookApplicationTests {
 	public void setup() {
 		List<String> ingredients = Arrays.asList("Ingredient 1", "Ingredient 2", "Ingredient 3");
 		recipes = IntStream.range(1, 4).mapToObj(i ->
-				new Recipe(LocalDateTime.now(), i % 2 == 0,
+				new Recipe("Recipe " + i, LocalDateTime.now(), i % 2 == 0,
 						(byte) i, ingredients, "Instruction " + i))
 				.collect(toList());
 		repository.saveAll(recipes);
@@ -54,13 +54,15 @@ class RecipesBookApplicationTests {
 
 	@Test
 	public void whenCreateRecipeThenRecipe() throws Exception {
-		String content = "{ \"suitableFor\": 2, \"vegetarian\": true, \"ingredients\": [ \"1kg of something\" ], " +
+		String content = "{ \"title\": \"my recipe\", \"suitableFor\": 2," +
+				" \"vegetarian\": true, \"ingredients\": [ \"1kg of something\" ], " +
 				"\"instructions\": \"Mix this with that\" }";
 		this.mockMvc.perform(post("/recipes")
 				.content(content)
 				.contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.version", is(0)))
+				.andExpect(jsonPath("$.title", is("my recipe")))
 				.andExpect(jsonPath("$.suitableFor", is(2)))
 				.andExpect(jsonPath("$.vegetarian", is(true)))
 				.andExpect(jsonPath("$.ingredients[0]", is("1kg of something")))

@@ -29,7 +29,7 @@ public class RecipeUnitTest {
     private void setup() throws RecipeNotFoundException {
         List<String> ingredients = Arrays.asList("Ingredient 1", "Ingredient 2", "Ingredient 3");
         recipes = IntStream.range(1, 4).mapToObj(i ->
-                new Recipe(LocalDateTime.now(), i % 2 == 0,
+                new Recipe("My recipe", LocalDateTime.now(), i % 2 == 0,
                         (byte) i, ingredients, "Instruction " + i))
                 .collect(toList());
         when(recipeService.listAllRecipes()).thenReturn(recipes);

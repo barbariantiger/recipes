@@ -18,6 +18,8 @@ public class Recipe {
     private String id;
     @Version
     private Long version;
+    @NotBlank(message = "Please give you recipe a name.")
+    private String title;
     private LocalDateTime createdOn;
     @NotNull(message = "Is it a vegetarian dish?")
     private Boolean vegetarian;
@@ -32,8 +34,9 @@ public class Recipe {
     public Recipe() {
     }
 
-    public Recipe(LocalDateTime createdOn, Boolean vegetarian,
+    public Recipe(String title, LocalDateTime createdOn, Boolean vegetarian,
                   Byte suitableFor, List<String> ingredients, String instructions) {
+        this.title = title;
         this.createdOn = createdOn;
         this.vegetarian = vegetarian;
         this.suitableFor = suitableFor;
@@ -89,6 +92,14 @@ public class Recipe {
         this.instructions = instructions;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -107,6 +118,7 @@ public class Recipe {
         return "Recipe{" +
                 "id='" + id + '\'' +
                 ", version=" + version +
+                ", title=" + title +
                 ", createdOn=" + createdOn +
                 ", vegetarian=" + vegetarian +
                 ", suitableFor=" + suitableFor +
